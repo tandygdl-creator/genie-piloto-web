@@ -363,7 +363,7 @@
     // (opcional: preguntar solo una vez)
     if (!localStorage.getItem('userEmail')) {
         setTimeout(() => {
-            const email = prompt("Bienvenido. Por favor ingresa tu correo corporativo (@ab-inbev.com):");
+            const email = prompt("Bienvenido. Por favor ingresa tu correo corporativo:");
             if (email && email.endsWith('@ab-inbev.com')) {
                 localStorage.setItem('userEmail', email);
             } else {
