@@ -3,64 +3,376 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Genie Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genie - Asistente Modelo</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        #chat { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
-        .user { text-align: right; color: blue; }
-        .bot { text-align: left; color: green; }
-        #input { width: 80%; padding: 8px; }
-        #send { padding: 8px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #002B5C 0%, #001F44 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Contenedor principal del chat */
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            background: #FFFFFF;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            max-height: 700px;
+        }
+
+        /* Cabecera con imagen y título */
+        .chat-header {
+            background: #002B5C;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 3px solid #F5B81B;
+        }
+
+        .bot-avatar {
+            width: 50px;
+            height: 50px;
+            background: #F5B81B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #002B5C;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .header-text {
+            color: white;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Área de mensajes */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #F8F9FA;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #002B5C;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: #E9ECEF;
+            color: #002B5C;
+            border-bottom-left-radius: 4px;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .bot-message .bot-icon {
+            font-size: 20px;
+            margin-right: 4px;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        /* Indicador de escritura */
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: #E9ECEF;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            font-size: 0.85rem;
+            color: #6C757D;
+        }
+
+        .typing-indicator span {
+            animation: blink 1.4s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Área de entrada */
+        .chat-input-area {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #DEE2E6;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #CED4DA;
+            border-radius: 40px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #F5B81B;
+            box-shadow: 0 0 0 3px rgba(245, 184, 27, 0.2);
+        }
+
+        .chat-input-area button {
+            background: #F5B81B;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 24px;
+            font-weight: bold;
+            color: #002B5C;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-input-area button:hover {
+            background: #E0A800;
+            transform: scale(1.02);
+        }
+
+        .chat-input-area button:active {
+            transform: scale(0.98);
+        }
+
+        /* Scroll personalizado */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #F1F3F5;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ADB5BD;
+            border-radius: 3px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .chat-container {
+                height: 90vh;
+                border-radius: 16px;
+            }
+            .message {
+                max-width: 90%;
+            }
+            .chat-header h1 {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <h2>Genie Conversacional</h2>
-    <div id="chat"></div>
-    <input type="text" id="input" placeholder="Escribe tu pregunta...">
-    <button id="send">Enviar</button>
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="bot-avatar">
+            🍺
+        </div>
+        <div class="header-text">
+            <h1>Genie Asistente</h1>
+            <p>Tu copiloto de datos con estilo Modelo</p>
+        </div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="message bot-message">
+            <span class="bot-icon">🤖</span>
+            <div class="message-content">¡Hola! Soy Genie, tu asistente inteligente. Pregúntame sobre ventas, NPS o cualquier dato de la compañía.</div>
+        </div>
+    </div>
+    <div class="typing-indicator" id="typingIndicator">
+        <span>Genie está escribiendo</span><span>.</span><span>.</span><span>.</span>
+    </div>
+    <div class="chat-input-area">
+        <input type="text" id="questionInput" placeholder="Escribe tu pregunta aquí..." autocomplete="off">
+        <button id="sendButton">Enviar ✨</button>
+    </div>
+</div>
 
-    <script>
-        const API_URL = "https://tu-backend.azurewebsites.net/ask";  // Cambiar por tu URL real
-        const userEmail = prompt("Ingresa tu correo corporativo:");
+<script>
+    // ================= CONFIGURACIÓN =================
+    // Cambia esta URL por la de tu backend cuando esté desplegado
+    const API_URL = "https://tu-backend-en-render.onrender.com/ask";  // ⚠️ ACTUALIZAR
 
-        const chatDiv = document.getElementById('chat');
-        const input = document.getElementById('input');
-        const sendBtn = document.getElementById('send');
+    // Simulación local (para pruebas sin backend, activa la línea de abajo y comenta la URL real)
+    // const USE_MOCK = true;
+    // =================================================
 
-        function addMessage(text, isUser) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = isUser ? 'user' : 'bot';
-            msgDiv.innerText = text;
-            chatDiv.appendChild(msgDiv);
-            chatDiv.scrollTop = chatDiv.scrollHeight;
+    const chatMessages = document.getElementById('chatMessages');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const input = document.getElementById('questionInput');
+    const sendBtn = document.getElementById('sendButton');
+
+    // Función para agregar un mensaje al chat
+    function addMessage(text, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+        if (isUser) {
+            messageDiv.classList.add('user-message');
+            messageDiv.textContent = text;
+        } else {
+            messageDiv.classList.add('bot-message');
+            const iconSpan = document.createElement('span');
+            iconSpan.classList.add('bot-icon');
+            iconSpan.textContent = '🤖';
+            const contentSpan = document.createElement('div');
+            contentSpan.classList.add('message-content');
+            contentSpan.textContent = text;
+            messageDiv.appendChild(iconSpan);
+            messageDiv.appendChild(contentSpan);
         }
+        chatMessages.appendChild(messageDiv);
+        // Auto-scroll hacia abajo
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 
-        async function ask(question) {
-            addMessage(question, true);
-            input.value = '';
+    // Función para simular respuesta (si no hay backend)
+    function mockAnswer(question) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(`Simulación: Recibí tu pregunta "${question}". Conecta el backend real para obtener respuestas de Genie.`);
+            }, 1000);
+        });
+    }
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: userEmail, question: question })
-                });
-                const data = await response.json();
-                if (data.error) {
-                    addMessage(Error: ${data.error}, false);
-                } else {
-                    addMessage(data.answer, false);
-                }
-            } catch (error) {
-                addMessage(Error de conexión: ${error.message}, false);
+    // Función principal para enviar pregunta al backend
+    async function askQuestion(question) {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) {
+            const email = prompt("Por favor ingresa tu correo corporativo (@ab-inbev.com):");
+            if (!email || !email.endsWith('@ab-inbev.com')) {
+                addMessage("Correo no válido. Debe ser del dominio @ab-inbev.com.", false);
+                return;
             }
+            localStorage.setItem('userEmail', email);
         }
 
-        sendBtn.onclick = () => {
-            const q = input.value.trim();
-            if (q) ask(q);
-        };
-        input.onkeypress = (e) => { if (e.key === 'Enter') sendBtn.click(); };
-    </script>
+        const email = localStorage.getItem('userEmail');
+
+        // Mostrar indicador de escritura
+        typingIndicator.style.display = 'flex';
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+            // Si usas mock para pruebas sin backend, activar aquí
+            if (typeof USE_MOCK !== 'undefined' && USE_MOCK) {
+                const mockResp = await mockAnswer(question);
+                typingIndicator.style.display = 'none';
+                addMessage(mockResp, false);
+                return;
+            }
+
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    question: question
+                })
+            });
+
+            const data = await response.json();
+            typingIndicator.style.display = 'none';
+
+            if (response.ok) {
+                addMessage(data.answer || "Respuesta obtenida", false);
+            } else {
+                addMessage(`Error: ${data.error || "No se pudo obtener respuesta"}`, false);
+            }
+        } catch (error) {
+            typingIndicator.style.display = 'none';
+            addMessage(`Error de conexión: ${error.message}. Verifica que el backend esté activo.`, false);
+            console.error(error);
+        }
+    }
+
+    // Evento al hacer clic en enviar
+    sendBtn.addEventListener('click', () => {
+        const question = input.value.trim();
+        if (question === "") return;
+        addMessage(question, true);
+        input.value = "";
+        askQuestion(question);
+    });
+
+    // Evento Enter
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendBtn.click();
+        }
+    });
+
+    // Guardar email en localStorage para futuras visitas
+    // (opcional: preguntar solo una vez)
+    if (!localStorage.getItem('userEmail')) {
+        setTimeout(() => {
+            const email = prompt("Bienvenido. Por favor ingresa tu correo corporativo (@ab-inbev.com):");
+            if (email && email.endsWith('@ab-inbev.com')) {
+                localStorage.setItem('userEmail', email);
+            } else {
+                alert("El correo debe ser del dominio @ab-inbev.com");
+                // Recargar para volver a pedir
+                location.reload();
+            }
+        }, 500);
+    }
+</script>
 </body>
 </html>
