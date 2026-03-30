@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Genie Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #chat { border: 1px solid #ccc; height: 400px; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
+        .user { text-align: right; color: blue; }
+        .bot { text-align: left; color: green; }
+        #input { width: 80%; padding: 8px; }
+        #send { padding: 8px; }
+    </style>
+</head>
+<body>
+    <h2>Genie Conversacional</h2>
+    <div id="chat"></div>
+    <input type="text" id="input" placeholder="Escribe tu pregunta...">
+    <button id="send">Enviar</button>
+
+    <script>
+        const API_URL = "https://tu-backend.azurewebsites.net/ask";  // Cambiar por tu URL real
+        const userEmail = prompt("Ingresa tu correo corporativo:");
+
+        const chatDiv = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('send');
+
+        function addMessage(text, isUser) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isUser ? 'user' : 'bot';
+            msgDiv.innerText = text;
+            chatDiv.appendChild(msgDiv);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+
+        async function ask(question) {
+            addMessage(question, true);
+            input.value = '';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: userEmail, question: question })
+                });
+                const data = await response.json();
+                if (data.error) {
+                    addMessage(Error: ${data.error}, false);
+                } else {
+                    addMessage(data.answer, false);
+                }
+            } catch (error) {
+                addMessage(Error de conexión: ${error.message}, false);
+            }
+        }
+
+        sendBtn.onclick = () => {
+            const q = input.value.trim();
+            if (q) ask(q);
+        };
+        input.onkeypress = (e) => { if (e.key === 'Enter') sendBtn.click(); };
+    </script>
+</body>
+</html>
